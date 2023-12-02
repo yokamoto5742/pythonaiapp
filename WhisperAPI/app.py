@@ -1,4 +1,5 @@
 import streamlit as st
+
 from openai import OpenAI
 
 client = OpenAI()
@@ -19,10 +20,19 @@ def transcribe_audio(file):
 def main():
     st.title("音声ファイルの文字起こしツール")
 
+    if 'uploaded_audio_file' not in st.session_state:
+        st.session_state.uploaded_audio_file = None
+
     # 音声ファイルのアップロード
-    uploaded_audio_file = st.file_uploader("音声ファイルをアップロードしてください(20MB以下)", type=["mp3"])
+    uploaded_audio_file = st.file_uploader("音声ファイルをアップロードしてください(20MB以下)", type=["mp3"], key="audio_uploader")
+
+    if st.button('クリア'):
+        st.session_state.uploaded_audio_file = None
+        st.experimental_rerun()
 
     if uploaded_audio_file is not None:
+        st.session_state.uploaded_audio_file = uploaded_audio_file
+
         # ファイルサイズのチェック（20MB以上の場合はエラーメッセージを表示）
         if uploaded_audio_file.size > 20480 * 1024:
             st.error("ファイルサイズが大きすぎます。20MB以下のファイルをアップロードしてください。")
